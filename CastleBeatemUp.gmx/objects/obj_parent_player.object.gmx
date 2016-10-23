@@ -41,6 +41,9 @@ var plyr_defense;
 
 // Weight stat for determining how to much to fly when hit
 var plyr_weight;
+
+// Stamina, gates the skill casting
+var stamina;
 </string>
           </argument>
         </arguments>

@@ -5,7 +5,7 @@
   <visible>-1</visible>
   <depth>0</depth>
   <persistent>0</persistent>
-  <parentName>&lt;undefined&gt;</parentName>
+  <parentName>obj_parent_player</parentName>
   <maskName>&lt;undefined&gt;</maskName>
   <events>
     <event eventtype="0" enumb="0">
@@ -25,7 +25,9 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>// Establish variable values for slayer
+            <string>image_index = 0;
+
+// Establish variable values for slayer
 plyr_attackpwr = 10;
 plyr_strength = 10;
 plyr_agility = 1.3;
@@ -83,6 +85,14 @@ plyr_weight = 10;
           <argument>
             <kind>1</kind>
             <string>depth = -y;
+
+// Attacking animation
+if (keyboard_check(vk_left)) {
+    if (sprite_index == spr_slayer_up) sprite_index = spr_slayer_atk_up;
+    else if (sprite_index == spr_slayer_right) sprite_index = spr_slayer_atk_right;
+    else if (sprite_index == spr_slayer_left) sprite_index = spr_slayer_atk_left;
+    else if (sprite_index == spr_slayer_down) sprite_index = spr_slayer_atk_down;
+}
 
 // Moving Up
 if (keyboard_check(ord("W"))) {
