@@ -25,9 +25,10 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>sprite_index = spr_enm_soldier_down;
+            <string>image_index = 0;
 image_speed = 0.3;
-var plyr_dist = 0;
+plyr_dist = 0;
+frame_counter = 0;
 </string>
           </argument>
         </arguments>
@@ -52,11 +53,40 @@ var plyr_dist = 0;
             <kind>1</kind>
             <string>depth = -y
 plyr_dist = point_distance(x, y, obj_slayer.x, obj_slayer.y);
+image_speed = 0.2;
 
 if ((plyr_dist &lt; 200) &amp;&amp; (plyr_dist &gt; 60)) {
     move_towards_point(obj_slayer.x, obj_slayer.y, 1);
 }
-else speed = 0;
+else { /*if (plyr_dist &lt; 60)*/
+    speed = 0;
+    image_index = 1;
+}
+/* This is for random movement
+else {
+    frame_counter += 1;
+    if (frame_counter &gt; 60) {
+        speed = 0;
+    }
+    if (frame_counter &gt; 120) {
+        direction = random(360);
+        speed = 1;
+        frame_counter = 0;
+    }
+}*/
+
+if ((direction &gt;= 45) &amp;&amp; (direction &lt; 135)) {
+    sprite_index = spr_enm_soldier_up;
+}
+if (((direction &gt;= 315) &amp;&amp; (direction &lt; 360)) || ((direction &gt;= 0) &amp;&amp; (direction &lt; 45))) {
+    sprite_index = spr_enm_soldier_right;
+}
+if ((direction &gt;= 135) &amp;&amp; (direction &lt; 225)) {
+    sprite_index = spr_enm_soldier_left;
+}
+if ((direction &gt;= 225) &amp;&amp; (direction &lt; 315)) {
+    sprite_index = spr_enm_soldier_down;
+}
 </string>
           </argument>
         </arguments>
