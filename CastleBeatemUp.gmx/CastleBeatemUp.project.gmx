@@ -13,16 +13,17 @@
         <sprite>sprites\spr_slayer_right</sprite>
         <sprite>sprites\spr_slayer_left</sprite>
         <sprite>sprites\spr_slayer_down</sprite>
-        <sprite>sprites\spr_slayer_text</sprite>
         <sprite>sprites\spr_slayer_atk_right</sprite>
         <sprite>sprites\spr_slayer_atk_left</sprite>
         <sprite>sprites\spr_slayer_atk_up</sprite>
         <sprite>sprites\spr_slayer_atk_down</sprite>
       </sprites>
+      <sprite>sprites\spr_player_text</sprite>
     </sprites>
     <sprites name="map_objects">
       <sprite>sprites\spr_box</sprite>
       <sprite>sprites\spr_wall</sprite>
+      <sprite>sprites\spr_invisible_bunny</sprite>
     </sprites>
     <sprites name="enemy_characters">
       <sprite>sprites\spr_enm_soldier_stand</sprite>
@@ -34,15 +35,19 @@
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
+  <fonts name="fonts">
+    <font>fonts\font0</font>
+  </fonts>
   <objects name="objects">
     <objects name="player_chars">
       <object>objects\obj_parent_player</object>
       <object>objects\obj_slayer</object>
-      <object>objects\obj_text_slayer</object>
+      <object>objects\obj_text_player</object>
     </objects>
     <objects name="map_objecs">
       <object>objects\obj_box</object>
       <object>objects\obj_wall</object>
+      <object>objects\obj_invisible_bunny</object>
     </objects>
     <object>objects\obj_enm_soldier</object>
     <object>objects\obj_parent_enemy</object>
