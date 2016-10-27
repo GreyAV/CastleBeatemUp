@@ -30,7 +30,9 @@ y = obj_parent_player.y;
 depth = -y;
 draw_set_halign(fa_center);
 draw_set_colour(c_black);
-draw_text(obj_parent_player.x, obj_parent_player.y - 50, "Slayer");
+draw_text(obj_parent_player.x, obj_parent_player.y - 80, "Slayer#HP:" + 
+string(obj_parent_player.unit_health) + "#St:" + 
+string(obj_parent_player.unit_stamina));
 </string>
           </argument>
         </arguments>

@@ -5,7 +5,7 @@
   <visible>-1</visible>
   <depth>0</depth>
   <persistent>0</persistent>
-  <parentName>&lt;undefined&gt;</parentName>
+  <parentName>obj_parent_map</parentName>
   <maskName>&lt;undefined&gt;</maskName>
   <events>
     <event eventtype="0" enumb="0">
@@ -26,7 +26,6 @@
           <argument>
             <kind>1</kind>
             <string>frame_counter = 0;
-funny_check = "beep ";
 frame_time = date_current_datetime();
 frame_count = 0;
 </string>
@@ -52,15 +51,13 @@ frame_count = 0;
           <argument>
             <kind>1</kind>
             <string>frame_counter += 1;
-draw_text(60,10, funny_check + string(frame_count) + " FPS");
+draw_set_halign(fa_left);
+draw_text(15,10, "Manual: " + string(frame_count) + " FPS#Real FPS: " + string(fps_real));
 
 if (1 == date_second_span(frame_time, date_current_datetime())) {
     frame_count = frame_counter;
     frame_counter = 0;
     frame_time = date_current_datetime();
-    if (funny_check == "beep ") funny_check = "boop ";
-    else funny_check = "beep ";
-
 }
 </string>
           </argument>

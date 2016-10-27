@@ -26,47 +26,44 @@
           <argument>
             <kind>1</kind>
             <string>// *** Variable setup for all player characters
-// Attack power stat
-var plyr_attackpwr;
+// Attack/Skills (Initialization needed on child object create)
+unit_skilla_atkpow = 0;  // Basic attack power stat (Default = 100)
+unit_skilla_cd = 0;      // Basic attack cooldown (In Seconds)
+unit_skilla_sc = 0;      // Skill A stamina cost
+unit_skilla_counter = 0; // Skill A counter for cd calc
+unit_skillb_atkpow = 0;  // Special ability power stat
+unit_skillb_cd = 0;      // Special ability cooldown (In Seconds)
+unit_skillb_sc = 0;      // Skill B stamina cost
+unit_skillb_counter = 0; // Skill B counter for cd calc
+unit_skillc_cd = 0;      // Defensive ability cooldown (In Seconds)
+unit_skillc_sc = 0;      // Skill C stamina cost
+unit_skillc_counter = 0; // Skill C counter for cd calc
 
-// Strength stat for calculating push
-var plyr_strength;
+// Player statistics (Initialization needed on child object create)
+unit_health = 0;        // Health of unit
+unit_strength = 0;      // Calculating push and knockback
+unit_defense = 0;       // Defense stat for damage mitigation
+unit_agility = 0;       // Calculating movement speed
+unit_spranim_speed = 0; // Sprite animation speed (used with agility)
+unit_weight = 0;        // Weight stat for determining how to much to fly when hit
+unit_stamina = 0;       // Stamina, limits skill casting
 
-// Agility stat for calculating movement speed and sprite animation speed
-var plyr_agility;
-var plyr_spranim_speed // use this to have movement correspond with animation
+// Status indicators (Initialization not needed)
+unit_atk_state = false; // For attacking skill use
+unit_def_state = false; // For defensive skill use
+unit_tgt_state = true;  // Used when after receiving damage (targetable)
+unit_pushable = true;
 
-// Defense stat for damage mitigation
-var plyr_defense;
+// Sprite assignment variables
+// ...assignments go here...
 
-// Weight stat for determining how to much to fly when hit
-var plyr_weight;
-
-// Stamina, gates the skill casting
-var stamina;
+// General variables (Initialization not needed)
+unit_fps = 60; // Calculate seconds
+dir_e = 0;
+dir_n = 90;
+dir_w = 180;
+dir_s = 270;
 </string>
-          </argument>
-        </arguments>
-      </action>
-    </event>
-    <event eventtype="3" enumb="0">
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string></string>
           </argument>
         </arguments>
       </action>

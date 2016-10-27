@@ -48,9 +48,12 @@
       <object>objects\obj_box</object>
       <object>objects\obj_wall</object>
       <object>objects\obj_invisible_bunny</object>
+      <object>objects\obj_parent_map</object>
     </objects>
-    <object>objects\obj_enm_soldier</object>
-    <object>objects\obj_parent_enemy</object>
+    <objects name="enemy_chars">
+      <object>objects\obj_enm_soldier</object>
+      <object>objects\obj_parent_enemy</object>
+    </objects>
   </objects>
   <rooms name="rooms">
     <room>rooms\rm_mainmap</room>
