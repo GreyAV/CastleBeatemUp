@@ -20,8 +20,8 @@
   <width>48</width>
   <height>48</height>
   <frames>
-    <frame index="0">images\spr_enm_soldier_right_0.png</frame>
-    <frame index="1">images\spr_enm_soldier_right_1.png</frame>
-    <frame index="2">images\spr_enm_soldier_right_2.png</frame>
+    <frame index="0">images\spr_enm_mage_right_0.png</frame>
+    <frame index="1">images\spr_enm_mage_right_1.png</frame>
+    <frame index="2">images\spr_enm_mage_right_2.png</frame>
   </frames>
 </sprite>

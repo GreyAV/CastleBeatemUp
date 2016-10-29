@@ -26,11 +26,16 @@
       <sprite>sprites\spr_invisible_bunny</sprite>
     </sprites>
     <sprites name="enemy_characters">
-      <sprite>sprites\spr_enm_soldier_stand</sprite>
-      <sprite>sprites\spr_enm_soldier_up</sprite>
-      <sprite>sprites\spr_enm_soldier_left</sprite>
-      <sprite>sprites\spr_enm_soldier_right</sprite>
-      <sprite>sprites\spr_enm_soldier_down</sprite>
+      <sprites name="enm_attacker">
+        <sprite>sprites\spr_enm_mage_stand</sprite>
+        <sprite>sprites\spr_enm_mage_up</sprite>
+        <sprite>sprites\spr_enm_mage_left</sprite>
+        <sprite>sprites\spr_enm_mage_down</sprite>
+        <sprite>sprites\spr_enm_mage_right</sprite>
+      </sprites>
+      <sprites name="enm_tdummy">
+        <sprite>sprites\spr_enm_tdummy</sprite>
+      </sprites>
     </sprites>
   </sprites>
   <backgrounds name="background"/>
@@ -51,8 +56,10 @@
       <object>objects\obj_parent_map</object>
     </objects>
     <objects name="enemy_chars">
-      <object>objects\obj_enm_soldier</object>
+      <object>objects\obj_enm_mage</object>
       <object>objects\obj_parent_enemy</object>
+      <object>objects\obj_enm_tdummy</object>
+      <object>objects\obj_enm_text</object>
     </objects>
   </objects>
   <rooms name="rooms">
