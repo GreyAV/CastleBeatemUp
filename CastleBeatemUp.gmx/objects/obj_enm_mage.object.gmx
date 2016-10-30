@@ -97,29 +97,48 @@ unit_pushable = true;   // Used to determine if a pushable object
             <kind>1</kind>
             <string>depth = -y
 plyr_dist = point_distance(x, y, obj_slayer.x, obj_slayer.y);
+plyr_dir = point_direction(x, y, obj_slayer.x, obj_slayer.y);
 image_speed = unit_spranim_speed;
+if (unit_health &lt; 0) instance_destroy();
+else if (unit_health &lt; 100) unit_health += (5/60);
 
 // Attack animation
 // ... Attack code block goes here...
 
 // Player tracking
-if ((plyr_dist &lt; 200) &amp;&amp; (plyr_dist &gt; 60)) {
-    move_towards_point(obj_slayer.x, obj_slayer.y, unit_agility);
-}
-else if (plyr_dist &lt; 60) {
-    speed = 0;
-    image_index = 1;
-}
-// Random movement
-else {
-    frame_counter += 1;
-    if (frame_counter &gt; 60) {
+if (unit_tgt_state == true) {
+    if ((plyr_dist &lt; 200) &amp;&amp; (plyr_dist &gt; 60)) {
+        move_towards_point(obj_slayer.x, obj_slayer.y, unit_agility);
+    }
+    else if (plyr_dist &lt; 60) {
+        speed = 0;
+        image_index = 1;
+    }
+    // Random movement
+    else {
+        frame_counter += 1;
+        if (frame_counter &gt; 60) {
+            speed = 0;
+        }
+        if (frame_counter &gt; 120) {
+            direction = choose(0,90,180,270);
+            speed = unit_agility;
+            frame_counter = 0;
+        }
+    }
+
+    // Collision tracking
+    if (!place_empty(x+lengthdir_x(unit_agility, direction), y+lengthdir_y(unit_agility, direction))) {
         speed = 0;
     }
-    if (frame_counter &gt; 120) {
-        direction = choose(0,90,180,270);
-        speed = unit_agility;
-        frame_counter = 0;
+}
+else {
+    if (!place_empty(x+lengthdir_x(speed, direction), y+lengthdir_y(speed, direction))) {
+        speed = 0;
+    }
+    else speed -= 0.1;
+    if (speed == 0) {
+        unit_tgt_state = true;
     }
 }
 
@@ -136,6 +155,7 @@ if ((direction &gt;= 135) &amp;&amp; (direction &lt; 225)) {
 if ((direction &gt;= 225) &amp;&amp; (direction &lt; 315)) {
     sprite_index = spr_enm_mage_down;
 }
+if (speed = 0) image_index = 1;
 </string>
           </argument>
         </arguments>

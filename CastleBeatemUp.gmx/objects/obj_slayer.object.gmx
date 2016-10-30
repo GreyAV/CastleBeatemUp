@@ -29,7 +29,7 @@
 event_inherited();
 // Attack/Skills
 unit_skilla_atkpow = 180;
-unit_skilla_cd = 2;
+unit_skilla_cd = 0.5;
 unit_skilla_sc = 10;
 unit_skilla_counter = 0;
 unit_skillb_atkpow = 200;
@@ -102,9 +102,11 @@ unit_stamina = 100;
 depth = -y;
 if (unit_health &lt; 100) unit_health += (1/unit_fps);
 if (unit_stamina &lt; 100) unit_stamina += (10/unit_fps);
+if (unit_skilla_counter &gt; 0) unit_skilla_counter -= 1;
 
 // *** Attacking Section ***
-if ((keyboard_check_pressed(vk_left) &amp;&amp; (unit_stamina &gt; unit_skilla_sc)) &amp;&amp; (unit_atk_state == false)) {
+if ((keyboard_check_pressed(vk_left) &amp;&amp; (unit_stamina &gt; unit_skilla_sc)) &amp;&amp; (unit_atk_state == false) &amp;&amp;
+(unit_tgt_state == true) &amp;&amp; (unit_skilla_counter &lt;= 0)) {
     unit_atk_state = true;
     speed = 0;
     if (sprite_index == spr_slayer_up) sprite_index = spr_slayer_atk_up;
@@ -114,13 +116,33 @@ if ((keyboard_check_pressed(vk_left) &amp;&amp; (unit_stamina &gt; unit_skilla_s
     image_index = 0;
     image_speed = 0.1;
 }
-else if (unit_atk_state == true) {
-    if (floor(image_index) == 1) {
-        unit_health -= 1;
+else if ((unit_atk_state == true) &amp;&amp; (unit_tgt_state == true)) {
+    if ((image_index &gt;= 1) &amp;&amp; (image_index &lt; 1.1)) {
+        if (sprite_index == spr_slayer_atk_up) {
+            unit_inst = collision_rectangle(x-10,y-30,x+10,y,obj_parent_enemy,false,true);
+        }
+        else if (sprite_index == spr_slayer_atk_right) {
+            unit_inst = collision_rectangle(x,y-10,x+30,y+10,obj_parent_enemy,false,true);
+        }
+        else if (sprite_index == spr_slayer_atk_left) {
+            unit_inst = collision_rectangle(x-30,y-10,x,y+10,obj_parent_enemy,false,true);
+        }
+        else if (sprite_index == spr_slayer_atk_down) {
+            unit_inst = collision_rectangle(x-10,y,x+10,y+30,obj_parent_enemy,false,true);
+        }
+        if (unit_inst != noone) {
+            with (unit_inst) {
+                self.unit_health = self.unit_health - ((20 * other.unit_skilla_atkpow) / self.unit_defense);
+                self.unit_tgt_state = false;
+                self.direction = point_direction(other.x, other.y, self.x, self.y);
+                self.speed = (other.unit_strength + other.unit_skilla_atkpow) / (self.unit_weight / 1.5);
+            }
+        }
     }
     if (image_index &gt;= (image_number - 1)) {
         unit_atk_state = false;
         unit_stamina -= unit_skilla_sc;
+        unit_skilla_counter = (unit_skilla_cd * unit_fps)
         if (sprite_index == spr_slayer_atk_up) sprite_index = spr_slayer_up;
         else if (sprite_index == spr_slayer_atk_right) sprite_index = spr_slayer_right;
         else if (sprite_index == spr_slayer_atk_left) sprite_index = spr_slayer_left;
@@ -130,8 +152,8 @@ else if (unit_atk_state == true) {
 }
 
 // *** Moving Section ***
-// * Moving in the upward direction
-if (keyboard_check(ord("W")) &amp;&amp; (unit_atk_state == false)) {
+// * Moving in the Upward direction *
+if (keyboard_check(ord("W")) &amp;&amp; (unit_atk_state == false) &amp;&amp; (unit_tgt_state == true)) {
     // Moving just up
     if (!(keyboard_check(ord("A")) || keyboard_check(ord("D")))) {
         // Up and no collision
@@ -142,7 +164,7 @@ if (keyboard_check(ord("W")) &amp;&amp; (unit_atk_state == false)) {
             image_speed = unit_spranim_speed;
         }
         // Up with collision
-        else if (!place_empty(x+lengthdir_x(unit_agility, dir_n), y+lengthdir_y(unit_agility, dir_n))) {
+        else {
             direction = dir_n;
             speed = 0;
             sprite_index = spr_slayer_up;
@@ -150,200 +172,249 @@ if (keyboard_check(ord("W")) &amp;&amp; (unit_atk_state == false)) {
         }
     }
     // Moving up and to the right
-    else if (keyboard_check(ord("D"))) {
+    else if (keyboard_check(ord("D")) &amp;&amp; (sprite_index == spr_slayer_up)) {
         // Up/Right and no collision
-        if (place_empty(x+lengthdir_x(unit_agility, 45), y+lengthdir_y(unit_agility, 45))) {
-            if (sprite_index == spr_slayer_up) {
-                x += unit_agility;
-                y -= unit_agility;
+        if (place_empty(x+lengthdir_x(unit_agility, dir_ne), y+lengthdir_y(unit_agility, dir_ne))) {
+            direction = dir_ne;
+            speed = unit_agility;
+        }
+        // Up/Right with collision
+        else {
+            if (place_empty(x+lengthdir_x(unit_agility, dir_n), y+lengthdir_y(unit_agility, dir_n))) {
+                direction = dir_n;
+                speed = unit_agility;
             }
+            else if (place_empty(x+lengthdir_x(unit_agility, dir_e), y+lengthdir_y(unit_agility, dir_e))) {
+                direction = dir_e;
+                speed = unit_agility;
+            }
+            else speed = 0;
         }
     }
-    // Up/Right with collision
-    else if (keyboard_check(ord("D")) &amp;&amp; (sprite_index == spr_slayer_up) &amp;&amp; !place_empty(obj_slayer.x + unit_agility, obj_slayer.y - unit_agility)) {
-        if (place_empty(obj_slayer.x, obj_slayer.y - unit_agility)) {
-            y -= unit_agility;
+    // Moving up and to the left
+    else if (keyboard_check(ord("A")) &amp;&amp; (sprite_index == spr_slayer_up)) {
+        // Up/Left and no collision
+        if (place_empty(x+lengthdir_x(unit_agility, dir_nw), y+lengthdir_y(unit_agility, dir_nw))) {
+            direction = dir_nw;
+            speed = unit_agility;
         }
-        else if (place_empty(obj_slayer.x + unit_agility, obj_slayer.y)) {
-            x += unit_agility;
-            //sprite_index = spr_slayer_right;
-        }
-    }
-    // Up/Left and no collision
-    else if (keyboard_check(ord("A")) &amp;&amp; place_empty(obj_slayer.x - unit_agility, obj_slayer.y - unit_agility)) {
-        if (sprite_index == spr_slayer_up) {
-            x -= unit_agility;
-            y -= unit_agility;
-        }
-    }
-    // Up/Left with collision
-    else if (keyboard_check(ord("A")) &amp;&amp; (sprite_index == spr_slayer_up) &amp;&amp; !place_empty(obj_slayer.x - unit_agility, obj_slayer.y - unit_agility)) {
-        if (place_empty(obj_slayer.x, obj_slayer.y - unit_agility)) {
-            y -= unit_agility;
-        }
-        else if (place_empty(obj_slayer.x - unit_agility, obj_slayer.y)) {
-            x -= unit_agility;
-            //sprite_index = spr_slayer_left;
+        // Up/Left with collision
+        else {
+            if (place_empty(x+lengthdir_x(unit_agility, dir_n), y+lengthdir_y(unit_agility, dir_n))) {
+                direction = dir_n;
+                speed = unit_agility;
+            }
+            else if (place_empty(x+lengthdir_x(unit_agility, dir_w), y+lengthdir_y(unit_agility, dir_w))) {
+                direction = dir_w;
+                speed = unit_agility;
+            }
+            else speed = 0;
         }
     }
 }
 
-// Moving Right
-if (keyboard_check(ord("D")) &amp;&amp; (unit_atk_state == false)) {
-    // Right and no collision
-    if (!(keyboard_check(ord("W")) || keyboard_check(ord("S"))) &amp;&amp; place_empty(obj_slayer.x + unit_agility, obj_slayer.y)) {
-        x += unit_agility;
-        sprite_index = spr_slayer_right;
-        image_speed = unit_spranim_speed;
-    }
-    // Right with collision
-    else if (!(keyboard_check(ord("W")) || keyboard_check(ord("S"))) &amp;&amp; !place_empty(obj_slayer.x + unit_agility, obj_slayer.y)) {
-        sprite_index = spr_slayer_right;
-        image_speed = unit_spranim_speed;
-    }
-    // Right/Up and no collision
-    else if (keyboard_check(ord("W")) &amp;&amp; place_empty(obj_slayer.x + unit_agility, obj_slayer.y - unit_agility)) {
-        if (sprite_index == spr_slayer_right) {
-            x += unit_agility;
-            y -= unit_agility;
+// * Moving in the Rightward direction *
+if (keyboard_check(ord("D")) &amp;&amp; (unit_atk_state == false) &amp;&amp; (unit_tgt_state == true)) {
+    // Moving just right
+    if (!(keyboard_check(ord("W")) || keyboard_check(ord("S")))) {
+        // Right and no collision
+        if (place_empty(x+lengthdir_x(unit_agility, dir_e), y+lengthdir_y(unit_agility, dir_e))) {
+            direction = dir_e;
+            speed = unit_agility;
+            sprite_index = spr_slayer_right;
+            image_speed = unit_spranim_speed;
+        }
+        // Right with collision
+        else {
+            direction = dir_e;
+            speed = 0;
+            sprite_index = spr_slayer_right;
+            image_speed = unit_spranim_speed;
         }
     }
-    // Right/Up with collision
-    else if (keyboard_check(ord("W")) &amp;&amp; (sprite_index == spr_slayer_right) &amp;&amp; !place_empty(obj_slayer.x + unit_agility, obj_slayer.y - unit_agility)) {
-        if (place_empty(obj_slayer.x + unit_agility, obj_slayer.y)) {
-            x += unit_agility;
+    // Moving right and up
+    else if (keyboard_check(ord("W")) &amp;&amp; (sprite_index == spr_slayer_right)) {
+        // Right/Up and no collision
+        if (place_empty(x+lengthdir_x(unit_agility, dir_ne), y+lengthdir_y(unit_agility, dir_ne))) {
+            direction = dir_ne;
+            speed = unit_agility;
         }
-        else if (place_empty(obj_slayer.x, obj_slayer.y - unit_agility)) {
-            y -= unit_agility;
-            //sprite_index = spr_slayer_up;
-        }
-    }
-    // Right/Down and no collision
-    else if (keyboard_check(ord("S")) &amp;&amp; place_empty(obj_slayer.x + unit_agility, obj_slayer.y + unit_agility)) {
-        if (sprite_index == spr_slayer_right) {
-            x += unit_agility;
-            y += unit_agility;
-        }
-    }
-    // Right/Down with collision
-    else if (keyboard_check(ord("S")) &amp;&amp; (sprite_index == spr_slayer_right) &amp;&amp; !place_empty(obj_slayer.x + unit_agility, obj_slayer.y + unit_agility)) {
-        if (place_empty(obj_slayer.x + unit_agility, obj_slayer.y)) {
-            x += unit_agility;
-        }
-        else if (place_empty(obj_slayer.x, obj_slayer.y + unit_agility)) {
-            y += unit_agility;
-            //sprite_index = spr_slayer_down;
+        // Right/Up with collision
+        else {
+            if (place_empty(x+lengthdir_x(unit_agility, dir_e), y+lengthdir_y(unit_agility, dir_e))) {
+                direction = dir_e;
+                speed = unit_agility;
+            }
+            else if (place_empty(x+lengthdir_x(unit_agility, dir_n), y+lengthdir_y(unit_agility, dir_n))) {
+                direction = dir_n;
+                speed = unit_agility;
+            }
+            else speed = 0;
         }
     }
-}
-
-// Moving Left
-if (keyboard_check(ord("A")) &amp;&amp; (unit_atk_state == false)) {
-    // Left and no collision
-    if (!(keyboard_check(ord("W")) || keyboard_check(ord("S"))) &amp;&amp; place_empty(obj_slayer.x - unit_agility, obj_slayer.y)) {
-        x -= unit_agility;
-        sprite_index = spr_slayer_left;
-        image_speed = unit_spranim_speed;
-    }
-    // Up with collision
-    else if (!(keyboard_check(ord("W")) || keyboard_check(ord("S"))) &amp;&amp; !place_empty(obj_slayer.x - unit_agility, obj_slayer.y)) {
-        sprite_index = spr_slayer_left;
-        image_speed = unit_spranim_speed;
+    // Moving right and down
+    else if (keyboard_check(ord("S")) &amp;&amp; (sprite_index == spr_slayer_right)) {
+        // Right/Down and no collision
+        if (place_empty(x+lengthdir_x(unit_agility, dir_se), y+lengthdir_y(unit_agility, dir_se))) {
+            direction = dir_se;
+            speed = unit_agility;
         }
-    // Left/Up and no collision
-    else if (keyboard_check(ord("W")) &amp;&amp; place_empty(obj_slayer.x - unit_agility, obj_slayer.y - unit_agility)) {
-        if (sprite_index == spr_slayer_left) {
-            x -= unit_agility;
-            y -= unit_agility;
-        }
-    }
-    // Left/Up with collision
-    else if (keyboard_check(ord("W")) &amp;&amp; (sprite_index == spr_slayer_left) &amp;&amp; !place_empty(obj_slayer.x - unit_agility, obj_slayer.y - unit_agility)) {
-        if (place_empty(obj_slayer.x - unit_agility, obj_slayer.y)) {
-            x -= unit_agility;
-        }
-        else if (place_empty(obj_slayer.x, obj_slayer.y - unit_agility)) {
-            y -= unit_agility;
-            //sprite_index = spr_slayer_up;
-        }
-    }
-    // Left/Down and no collision
-    else if (keyboard_check(ord("S")) &amp;&amp; place_empty(obj_slayer.x - unit_agility, obj_slayer.y + unit_agility)) {
-        if (sprite_index == spr_slayer_left) {
-            x -= unit_agility;
-            y += unit_agility;
-        }
-    }
-    // Left/Down with collision
-    else if (keyboard_check(ord("S")) &amp;&amp; (sprite_index == spr_slayer_left) &amp;&amp; !place_empty(obj_slayer.x - unit_agility, obj_slayer.y + unit_agility)) {
-        if (place_empty(obj_slayer.x - unit_agility, obj_slayer.y)) {
-            x -= unit_agility;
-        }
-        else if (place_empty(obj_slayer.x, obj_slayer.y + unit_agility)) {
-            y += unit_agility;
-            //sprite_index = spr_slayer_down;
+        // Right/Down with collision
+        else {
+            if (place_empty(x+lengthdir_x(unit_agility, dir_e), y+lengthdir_y(unit_agility, dir_e))) {
+                direction = dir_e;
+                speed = unit_agility;
+            }
+            else if (place_empty(x+lengthdir_x(unit_agility, dir_s), y+lengthdir_y(unit_agility, dir_s))) {
+                direction = dir_s;
+                speed = unit_agility;
+            }
+            else speed = 0;
         }
     }
 }
 
-// Moving Down
-if (keyboard_check(ord("S")) &amp;&amp; (unit_atk_state == false)) {
-    // Down and no collision
-    if (!(keyboard_check(ord("A")) || keyboard_check(ord("D"))) &amp;&amp; place_empty(obj_slayer.x, obj_slayer.y + unit_agility)) {
-        y += unit_agility;
-        sprite_index = spr_slayer_down;
-        image_speed = unit_spranim_speed;
-    }
-    // Down with collision
-    else if (!(keyboard_check(ord("A")) || keyboard_check(ord("D"))) &amp;&amp; !place_empty(obj_slayer.x, obj_slayer.y + unit_agility)) {
-        sprite_index = spr_slayer_down;
-        image_speed = unit_spranim_speed;
-    }
-    // Down/Right and no collision
-    else if (keyboard_check(ord("D")) &amp;&amp; place_empty(obj_slayer.x + unit_agility, obj_slayer.y + unit_agility)) {
-        if (sprite_index == spr_slayer_down) {
-            x += unit_agility;
-            y += unit_agility;
+// * Moving in the Leftward direction *
+if (keyboard_check(ord("A")) &amp;&amp; (unit_atk_state == false) &amp;&amp; (unit_tgt_state == true)) {
+    // Moving just Left
+    if (!(keyboard_check(ord("W")) || keyboard_check(ord("S")))) {
+        // Left and no collision
+        if (place_empty(x+lengthdir_x(unit_agility, dir_w), y+lengthdir_y(unit_agility, dir_w))) {
+            direction = dir_w;
+            speed = unit_agility;
+            sprite_index = spr_slayer_left;
+            image_speed = unit_spranim_speed;
+        }
+        // Left with collision
+        else {
+            direction = dir_w;
+            speed = 0;
+            sprite_index = spr_slayer_left;
+            image_speed = unit_spranim_speed;
         }
     }
-    // Down/Right with collision
-    else if (keyboard_check(ord("D")) &amp;&amp; (sprite_index == spr_slayer_down) &amp;&amp; !place_empty(obj_slayer.x + unit_agility, obj_slayer.y + unit_agility)) {
-        if (place_empty(obj_slayer.x, obj_slayer.y + unit_agility)) {
-            y += unit_agility;
+    // Moving Left and Up
+    else if (keyboard_check(ord("W")) &amp;&amp; (sprite_index == spr_slayer_left)) {
+        // Left/Up and no collision
+        if (place_empty(x+lengthdir_x(unit_agility, dir_nw), y+lengthdir_y(unit_agility, dir_nw))) {
+            direction = dir_nw;
+            speed = unit_agility;
         }
-        else if (place_empty(obj_slayer.x + unit_agility, obj_slayer.y)) {
-            x += unit_agility;
-            //sprite_index = spr_slayer_right;
+        // Left/Up with collision
+        else {
+            if (place_empty(x+lengthdir_x(unit_agility, dir_w), y+lengthdir_y(unit_agility, dir_w))) {
+                direction = dir_w;
+                speed = unit_agility;
+            }
+            else if (place_empty(x+lengthdir_x(unit_agility, dir_n), y+lengthdir_y(unit_agility, dir_n))) {
+                direction = dir_n;
+                speed = unit_agility;
+            }
+            else speed = 0;
         }
     }
-    // Down/Left and no collision
-    else if (keyboard_check(ord("A")) &amp;&amp; place_empty(obj_slayer.x - unit_agility, obj_slayer.y + unit_agility)) {
-        if (sprite_index == spr_slayer_down) {
-            x -= unit_agility;
-            y += unit_agility;
+    // Moving Left and Down
+    else if (keyboard_check(ord("S")) &amp;&amp; (sprite_index == spr_slayer_left)) {
+        // Left/Down and no collision
+        if (place_empty(x+lengthdir_x(unit_agility, dir_sw), y+lengthdir_y(unit_agility, dir_sw))) {
+            direction = dir_sw;
+            speed = unit_agility;
+        }
+        // Left/Down with collision
+        else {
+            if (place_empty(x+lengthdir_x(unit_agility, dir_w), y+lengthdir_y(unit_agility, dir_w))) {
+                direction = dir_w;
+                speed = unit_agility;
+            }
+            else if (place_empty(x+lengthdir_x(unit_agility, dir_s), y+lengthdir_y(unit_agility, dir_s))) {
+                direction = dir_s;
+                speed = unit_agility;
+            }
+            else speed = 0;
         }
     }
-    // Down/Left with collision
-    else if (keyboard_check(ord("A")) &amp;&amp; (sprite_index == spr_slayer_down) &amp;&amp; !place_empty(obj_slayer.x - unit_agility, obj_slayer.y + unit_agility)) {
-        if (place_empty(obj_slayer.x, obj_slayer.y + unit_agility)) {
-            y += unit_agility;
+}
+
+// * Moving in the Downward direction *
+if (keyboard_check(ord("S")) &amp;&amp; (unit_atk_state == false) &amp;&amp; (unit_tgt_state == true)) {
+    // Moving just Down
+    if (!(keyboard_check(ord("A")) || keyboard_check(ord("D")))) {
+        // Down and no collision
+        if (place_empty(x+lengthdir_x(unit_agility, dir_s), y+lengthdir_y(unit_agility, dir_s))) {
+            direction = dir_s;
+            speed = unit_agility;
+            sprite_index = spr_slayer_down;
+            image_speed = unit_spranim_speed;
         }
-        else if (place_empty(obj_slayer.x - unit_agility, obj_slayer.y)) {
-            x -= unit_agility;
-            //sprite_index = spr_slayer_left;
+        // Down with collision
+        else {
+            direction = dir_s;
+            speed = 0;
+            sprite_index = spr_slayer_down;
+            image_speed = unit_spranim_speed;
+        }
+    }
+    // Moving Down and to the right
+    else if (keyboard_check(ord("D")) &amp;&amp; (sprite_index == spr_slayer_down)) {
+        // Down/Right and no collision
+        if (place_empty(x+lengthdir_x(unit_agility, dir_se), y+lengthdir_y(unit_agility, dir_se))) {
+            direction = dir_se;
+            speed = unit_agility;
+        }
+        // Down/Right with collision
+        else {
+            if (place_empty(x+lengthdir_x(unit_agility, dir_s), y+lengthdir_y(unit_agility, dir_s))) {
+                direction = dir_s;
+                speed = unit_agility;
+            }
+            else if (place_empty(x+lengthdir_x(unit_agility, dir_e), y+lengthdir_y(unit_agility, dir_e))) {
+                direction = dir_e;
+                speed = unit_agility;
+            }
+            else speed = 0;
+        }
+    }
+    // Moving Down and to the left
+    else if (keyboard_check(ord("A")) &amp;&amp; (sprite_index == spr_slayer_down)) {
+        // Down/Left and no collision
+        if (place_empty(x+lengthdir_x(unit_agility, dir_sw), y+lengthdir_y(unit_agility, dir_sw))) {
+            direction = dir_sw;
+            speed = unit_agility;
+        }
+        // Down/Left with collision
+        else {
+            if (place_empty(x+lengthdir_x(unit_agility, dir_s), y+lengthdir_y(unit_agility, dir_s))) {
+                direction = dir_s;
+                speed = unit_agility;
+            }
+            else if (place_empty(x+lengthdir_x(unit_agility, dir_w), y+lengthdir_y(unit_agility, dir_w))) {
+                direction = dir_w;
+                speed = unit_agility;
+            }
+            else speed = 0;
         }
     }
 }
 
 // Struck while defending
 if ((unit_def_state == true) &amp;&amp; (unit_tgt_state == false)) {
+    unit_atk_state = false;
     // Keep sprite the same
+    // Check for collisions
+        // If collide
+            // bounce off algorigthm
+            // push colliding object with momentum algorithm
     if (speed &gt; 0) speed -= 0.1;
-    // Keep same direction as when before struck
+    // Keep facing same direction as when before struck
 }
 
 // Struck while not defending
 if ((unit_def_state == false) &amp;&amp; (unit_tgt_state == false)) {
+    unit_atk_state = false;
+    // Check for collisions
+        // If collide
+            // bounce off algorigthm
+            // push colliding object with momentum algorithm
     if (speed &gt; 0) speed -= 0.1;
     // spinning animation
 }

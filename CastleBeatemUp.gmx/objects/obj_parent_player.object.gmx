@@ -58,11 +58,16 @@ unit_pushable = true;
 // ...assignments go here...
 
 // General variables (Initialization not needed)
+unit_inst = noone; // For collision checking
 unit_fps = 60; // Calculate seconds
 dir_e = 0;
 dir_n = 90;
 dir_w = 180;
 dir_s = 270;
+dir_ne = 45;
+dir_nw = 135;
+dir_sw = 225;
+dir_se = 315;
 </string>
           </argument>
         </arguments>
