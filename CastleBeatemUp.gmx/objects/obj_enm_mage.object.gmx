@@ -62,17 +62,29 @@ image_speed = 0.3;
 plyr_dist = 0;      // Player distance
 frame_counter = 0;
 
-// Player statistics (Initialization needed on child object create)
+// Attack/Skills
+unit_skilla_atkpow = 0;  // Basic attack power stat (Default = 100)
+unit_skilla_cd = 0;      // Basic attack cooldown (In Seconds)
+unit_skilla_sc = 0;      // Skill A stamina cost
+unit_skilla_counter = 0; // Skill A counter for cd calc
+
+// Unit statistics
 unit_health = 100;        // Health of unit
 unit_strength = 100;      // Calculating push and knockback
 unit_defense = 100;       // Defense stat for damage mitigation
 unit_agility = 1;       // Calculating movement speed
 unit_spranim_speed = 0.2; // Sprite animation speed (used with agility)
-unit_weight = 100;        // Weight stat for determining how to much to fly when hit
+unit_weight = 80;        // Weight stat for determining how to much to fly when hit
 unit_stamina = 100;       // Stamina, limits skill casting
 
+// Status indicators (Initialization not needed)
+unit_atk_state = false; // For attacking skill use
+unit_def_state = false; // For defensive skill use
 unit_tgt_state = true;  // Used when after receiving damage (targetable)
 unit_pushable = true;   // Used to determine if a pushable object
+
+// Sprite assignment variables
+// ...assignments go here...
 </string>
           </argument>
         </arguments>
@@ -111,7 +123,7 @@ if (unit_tgt_state == true) {
         move_towards_point(obj_slayer.x, obj_slayer.y, unit_agility);
     }
     else if (plyr_dist &lt; 60) {
-        speed = 0;
+        //speed = 0;
         image_index = 1;
     }
     // Random movement
@@ -126,20 +138,30 @@ if (unit_tgt_state == true) {
             frame_counter = 0;
         }
     }
-
-    // Collision tracking
-    if (!place_empty(x+lengthdir_x(unit_agility, direction), y+lengthdir_y(unit_agility, direction))) {
-        speed = 0;
-    }
 }
 else {
+    // Bounce
     if (!place_empty(x+lengthdir_x(speed, direction), y+lengthdir_y(speed, direction))) {
-        speed = 0;
+        if (!place_empty(x, y+lengthdir_y(speed, direction))) {
+            vspeed = -vspeed;
+        }
+        else if (!place_empty(x+lengthdir_x(speed, direction), y)) {
+            hspeed = -hspeed;
+        }
+        speed *= 0.8;
     }
-    else speed -= 0.1;
-    if (speed == 0) {
+    if (speed &gt; 0) {
+        speed -= 0.1;
+    }
+    else {
+        speed = 0;
         unit_tgt_state = true;
     }
+}
+
+// Collision tracking
+if (!place_empty(x+lengthdir_x(speed, direction), y+lengthdir_y(speed, direction))) {
+    speed = 0;
 }
 
 // Sprite direction
@@ -155,7 +177,7 @@ if ((direction &gt;= 135) &amp;&amp; (direction &lt; 225)) {
 if ((direction &gt;= 225) &amp;&amp; (direction &lt; 315)) {
     sprite_index = spr_enm_mage_down;
 }
-if (speed = 0) image_index = 1;
+if (speed == 0) image_index = 1;
 </string>
           </argument>
         </arguments>

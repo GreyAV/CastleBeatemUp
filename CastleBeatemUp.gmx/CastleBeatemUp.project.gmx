@@ -61,6 +61,8 @@
       <object>objects\obj_enm_tdummy</object>
       <object>objects\obj_enm_text</object>
     </objects>
+    <object>objects\obj_parent_untgt</object>
+    <object>objects\obj_parent_unit</object>
   </objects>
   <rooms name="rooms">
     <room>rooms\rm_mainmap</room>

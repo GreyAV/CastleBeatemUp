@@ -5,7 +5,7 @@
   <visible>-1</visible>
   <depth>0</depth>
   <persistent>0</persistent>
-  <parentName>obj_parent_map</parentName>
+  <parentName>obj_parent_untgt</parentName>
   <maskName>&lt;undefined&gt;</maskName>
   <events>
     <event eventtype="0" enumb="0">
@@ -25,7 +25,9 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>frame_counter = 0;
+            <string>unit_tgt_state = false;
+unit_health = 0;
+frame_counter = 0;
 frame_time = date_current_datetime();
 frame_count = 0;
 </string>

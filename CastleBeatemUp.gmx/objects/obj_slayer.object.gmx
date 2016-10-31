@@ -11,49 +11,6 @@
     <event eventtype="0" enumb="0">
       <action>
         <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>// *** Establish variable values for Slayer
-event_inherited();
-// Attack/Skills
-unit_skilla_atkpow = 180;
-unit_skilla_cd = 0.5;
-unit_skilla_sc = 10;
-unit_skilla_counter = 0;
-unit_skillb_atkpow = 200;
-unit_skillb_cd = 5;
-unit_skillb_sc = 50;
-unit_skillb_counter = 0;
-unit_skillc_cd = 1;
-unit_skillc_sc = 10;
-unit_skillc_counter = 0;
-
-// Player statistics
-unit_health = 100;
-unit_strength = 120;
-unit_defense = 80;
-unit_agility = 1.3;
-unit_spranim_speed = unit_agility / 11;
-unit_weight = 110;
-unit_stamina = 100;
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
         <id>201</id>
         <kind>0</kind>
         <userelative>-1</userelative>
@@ -77,6 +34,49 @@ unit_stamina = 100;
           <argument>
             <kind>0</kind>
             <string>0</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>// *** Establish variable values for Slayer
+event_inherited();
+// Attack/Skills
+unit_skilla_atkpow = 180;   // Basic attack power stat (Default = 100)
+unit_skilla_cd = 0.5;       // Basic attack cooldown (In Seconds)
+unit_skilla_sc = 10;        // Skill A stamina cost
+unit_skilla_counter = 0;    // Skill A counter for cd calc
+unit_skillb_atkpow = 200;   // Special ability power stat
+unit_skillb_cd = 5;         // Special ability cooldown (In Seconds)
+unit_skillb_sc = 50;        // Skill B stamina cost
+unit_skillb_counter = 0;    // Skill B counter for cd calc
+unit_skillc_cd = 1;         // Defensive ability cooldown (In Seconds)
+unit_skillc_sc = 10;        // Skill C stamina cost
+unit_skillc_counter = 0;    // Skill C counter for cd calc
+
+// Player statistics
+unit_health = 100;          // Health of unit
+unit_strength = 120;        // Calculating push and knockback
+unit_defense = 80;          // Defense stat for damage mitigation
+unit_agility = 1.3;         // Calculating movement speed
+unit_spranim_speed = unit_agility / 11; // Sprite animation speed (used with agility)
+unit_weight = 110;          // Weight stat for determining how to much to fly when hit
+unit_stamina = 100;         // Stamina, limits skill casting
+</string>
           </argument>
         </arguments>
       </action>
@@ -119,23 +119,25 @@ if ((keyboard_check_pressed(vk_left) &amp;&amp; (unit_stamina &gt; unit_skilla_s
 else if ((unit_atk_state == true) &amp;&amp; (unit_tgt_state == true)) {
     if ((image_index &gt;= 1) &amp;&amp; (image_index &lt; 1.1)) {
         if (sprite_index == spr_slayer_atk_up) {
-            unit_inst = collision_rectangle(x-10,y-30,x+10,y,obj_parent_enemy,false,true);
+            unit_inst = collision_rectangle(x-10,y-30,x+10,y,obj_parent_unit,false,true);
         }
         else if (sprite_index == spr_slayer_atk_right) {
-            unit_inst = collision_rectangle(x,y-10,x+30,y+10,obj_parent_enemy,false,true);
+            unit_inst = collision_rectangle(x,y-10,x+30,y+10,obj_parent_unit,false,true);
         }
         else if (sprite_index == spr_slayer_atk_left) {
-            unit_inst = collision_rectangle(x-30,y-10,x,y+10,obj_parent_enemy,false,true);
+            unit_inst = collision_rectangle(x-30,y-10,x,y+10,obj_parent_unit,false,true);
         }
         else if (sprite_index == spr_slayer_atk_down) {
-            unit_inst = collision_rectangle(x-10,y,x+10,y+30,obj_parent_enemy,false,true);
+            unit_inst = collision_rectangle(x-10,y,x+10,y+30,obj_parent_unit,false,true);
         }
         if (unit_inst != noone) {
             with (unit_inst) {
-                self.unit_health = self.unit_health - ((20 * other.unit_skilla_atkpow) / self.unit_defense);
-                self.unit_tgt_state = false;
-                self.direction = point_direction(other.x, other.y, self.x, self.y);
-                self.speed = (other.unit_strength + other.unit_skilla_atkpow) / (self.unit_weight / 1.5);
+                if (self.unit_tgt_state == true) {
+                    self.unit_health = self.unit_health - ((20 * other.unit_skilla_atkpow) / self.unit_defense);
+                    self.unit_tgt_state = false;
+                    self.direction = point_direction(other.x, other.y, self.x, self.y);
+                    self.speed = (other.unit_strength + other.unit_skilla_atkpow) / (self.unit_weight / 1.5);
+                }
             }
         }
     }
@@ -167,8 +169,32 @@ if (keyboard_check(ord("W")) &amp;&amp; (unit_atk_state == false) &amp;&amp; (un
         else {
             direction = dir_n;
             speed = 0;
-            sprite_index = spr_slayer_up;
-            image_speed = unit_spranim_speed;
+            unit_inst = collision_point(x, y-12,obj_parent_unit,false,true);
+            show_debug_message(string(unit_inst));
+            if (unit_inst != noone) {
+                with (unit_inst) {
+                    if (self.unit_pushable == true) {
+                        self.direction = 90;
+                        if (other.unit_strength &gt; self.unit_weight) {
+                            self.speed = other.unit_agility;
+                        }
+                        else {
+                            self.speed = (other.unit_strength / self.unit_weight) * other.unit_agility;
+                            other.speed = self.speed;
+                        }
+                        if (!(place_empty(self.x+lengthdir_x(self.speed, 90), self.y+lengthdir_y(self.speed, 90)))) {
+                            self.speed = 0;
+                            other.speed = 0;
+                        }
+                    }
+                }
+                sprite_index = spr_slayer_up;
+                image_speed = unit_spranim_speed;
+            }
+            else {
+                sprite_index = spr_slayer_up;
+                image_speed = unit_spranim_speed;
+            }
         }
     }
     // Moving up and to the right
@@ -228,8 +254,32 @@ if (keyboard_check(ord("D")) &amp;&amp; (unit_atk_state == false) &amp;&amp; (un
         else {
             direction = dir_e;
             speed = 0;
-            sprite_index = spr_slayer_right;
-            image_speed = unit_spranim_speed;
+            unit_inst = collision_point(x+20, y,obj_parent_unit,false,true);
+            show_debug_message(string(unit_inst));
+            if (unit_inst != noone) {
+                with (unit_inst) {
+                    if (self.unit_pushable == true) {
+                        self.direction = 0;
+                        if (other.unit_strength &gt; self.unit_weight) {
+                            self.speed = other.unit_agility;
+                        }
+                        else {
+                            self.speed = (other.unit_strength / self.unit_weight) * other.unit_agility;
+                            other.speed = self.speed;
+                        }
+                        if (!(place_empty(self.x+lengthdir_x(self.speed, 0), self.y+lengthdir_y(self.speed, 0)))) {
+                            self.speed = 0;
+                            other.speed = 0;
+                        }
+                    }
+                }
+                sprite_index = spr_slayer_right;
+                image_speed = unit_spranim_speed;
+            }
+            else {
+                sprite_index = spr_slayer_right;
+                image_speed = unit_spranim_speed;
+            }
         }
     }
     // Moving right and up
@@ -289,8 +339,32 @@ if (keyboard_check(ord("A")) &amp;&amp; (unit_atk_state == false) &amp;&amp; (un
         else {
             direction = dir_w;
             speed = 0;
-            sprite_index = spr_slayer_left;
-            image_speed = unit_spranim_speed;
+            unit_inst = collision_point(x-20, y,obj_parent_unit,false,true);
+            show_debug_message(string(unit_inst));
+            if (unit_inst != noone) {
+                with (unit_inst) {
+                    if (self.unit_pushable == true) {
+                        self.direction = 180;
+                        if (other.unit_strength &gt; self.unit_weight) {
+                            self.speed = other.unit_agility;
+                        }
+                        else {
+                            self.speed = (other.unit_strength / self.unit_weight) * other.unit_agility;
+                            other.speed = self.speed;
+                        }
+                        if (!(place_empty(self.x+lengthdir_x(self.speed, 180), self.y+lengthdir_y(self.speed, 180)))) {
+                            self.speed = 0;
+                            other.speed = 0;
+                        }
+                    }
+                }
+                sprite_index = spr_slayer_left;
+                image_speed = unit_spranim_speed;
+            }
+            else {
+                sprite_index = spr_slayer_left;
+                image_speed = unit_spranim_speed;
+            }
         }
     }
     // Moving Left and Up
@@ -350,8 +424,32 @@ if (keyboard_check(ord("S")) &amp;&amp; (unit_atk_state == false) &amp;&amp; (un
         else {
             direction = dir_s;
             speed = 0;
-            sprite_index = spr_slayer_down;
-            image_speed = unit_spranim_speed;
+            unit_inst = collision_point(x, y+12,obj_parent_unit,false,true);
+            show_debug_message(string(unit_inst));
+            if (unit_inst != noone) {
+                with (unit_inst) {
+                    if (self.unit_pushable == true) {
+                        self.direction = 270;
+                        if (other.unit_strength &gt; self.unit_weight) {
+                            self.speed = other.unit_agility;
+                        }
+                        else {
+                            self.speed = (other.unit_strength / self.unit_weight) * other.unit_agility;
+                            other.speed = self.speed;
+                        }
+                        if (!(place_empty(self.x+lengthdir_x(self.speed, 270), self.y+lengthdir_y(self.speed, 270)))) {
+                            self.speed = 0;
+                            other.speed = 0;
+                        }
+                    }
+                }
+                sprite_index = spr_slayer_down;
+                image_speed = unit_spranim_speed;
+            }
+            else {
+                sprite_index = spr_slayer_down;
+                image_speed = unit_spranim_speed;
+            }
         }
     }
     // Moving Down and to the right

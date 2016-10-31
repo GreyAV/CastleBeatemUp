@@ -25,7 +25,9 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string></string>
+            <string>unit_tgt_state = true;
+unit_health = 999999;
+</string>
           </argument>
         </arguments>
       </action>

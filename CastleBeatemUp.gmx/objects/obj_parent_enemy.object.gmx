@@ -5,7 +5,7 @@
   <visible>-1</visible>
   <depth>0</depth>
   <persistent>0</persistent>
-  <parentName>&lt;undefined&gt;</parentName>
+  <parentName>obj_parent_unit</parentName>
   <maskName>&lt;undefined&gt;</maskName>
   <events>
     <event eventtype="0" enumb="0">
@@ -26,29 +26,6 @@
           <argument>
             <kind>1</kind>
             <string>// *** Variable setup for all player characters
-// Attack/Skills (Initialization needed on child object create)
-unit_skilla_atkpow = 0;  // Basic attack power stat (Default = 100)
-unit_skilla_cd = 0;      // Basic attack cooldown (In Seconds)
-unit_skilla_sc = 0;      // Skill A stamina cost
-unit_skilla_counter = 0; // Skill A counter for cd calc
-
-// Player statistics (Initialization needed on child object create)
-unit_health = 0;        // Health of unit
-unit_strength = 0;      // Calculating push and knockback
-unit_defense = 0;       // Defense stat for damage mitigation
-unit_agility = 0;       // Calculating movement speed
-unit_spranim_speed = 0; // Sprite animation speed (used with agility)
-unit_weight = 0;        // Weight stat for determining how to much to fly when hit
-unit_stamina = 0;       // Stamina, limits skill casting
-
-// Status indicators (Initialization not needed)
-unit_atk_state = false; // For attacking skill use
-unit_def_state = false; // For defensive skill use
-unit_tgt_state = true;  // Used when after receiving damage (targetable)
-unit_pushable = false;   // Used to determine if a pushable object
-
-// Sprite assignment variables
-// ...assignments go here...
 
 // General variables (Initialization not needed)
 unit_fps = 60; // Calculate seconds
