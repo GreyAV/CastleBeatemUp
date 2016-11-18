@@ -170,7 +170,7 @@ if (keyboard_check(ord("W")) &amp;&amp; (unit_atk_state == false) &amp;&amp; (un
             direction = dir_n;
             speed = 0;
             unit_inst = collision_point(x, y-12,obj_parent_unit,false,true);
-            show_debug_message(string(unit_inst));
+            //show_debug_message(string(unit_inst));
             if (unit_inst != noone) {
                 with (unit_inst) {
                     if (self.unit_pushable == true) {
@@ -255,7 +255,7 @@ if (keyboard_check(ord("D")) &amp;&amp; (unit_atk_state == false) &amp;&amp; (un
             direction = dir_e;
             speed = 0;
             unit_inst = collision_point(x+20, y,obj_parent_unit,false,true);
-            show_debug_message(string(unit_inst));
+            //show_debug_message(string(unit_inst));
             if (unit_inst != noone) {
                 with (unit_inst) {
                     if (self.unit_pushable == true) {
@@ -340,7 +340,7 @@ if (keyboard_check(ord("A")) &amp;&amp; (unit_atk_state == false) &amp;&amp; (un
             direction = dir_w;
             speed = 0;
             unit_inst = collision_point(x-20, y,obj_parent_unit,false,true);
-            show_debug_message(string(unit_inst));
+            //show_debug_message(string(unit_inst));
             if (unit_inst != noone) {
                 with (unit_inst) {
                     if (self.unit_pushable == true) {
@@ -425,7 +425,7 @@ if (keyboard_check(ord("S")) &amp;&amp; (unit_atk_state == false) &amp;&amp; (un
             direction = dir_s;
             speed = 0;
             unit_inst = collision_point(x, y+12,obj_parent_unit,false,true);
-            show_debug_message(string(unit_inst));
+            //show_debug_message(string(unit_inst));
             if (unit_inst != noone) {
                 with (unit_inst) {
                     if (self.unit_pushable == true) {

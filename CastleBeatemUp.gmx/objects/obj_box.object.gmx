@@ -28,7 +28,7 @@
             <string>unit_tgt_state = false;
 unit_pushable = true;
 unit_health = 0;
-unit_weight = 20;
+unit_weight = 90;
 unit_defense = 0;
 </string>
           </argument>
@@ -54,6 +54,7 @@ unit_defense = 0;
             <kind>1</kind>
             <string>depth = -y;
 if (speed &gt; 0) speed -= 0.1;
+else speed = 0;
 if (!place_empty(x+lengthdir_x(speed, direction), y+lengthdir_y(speed, direction))) {
     speed = 0;
 }

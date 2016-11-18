@@ -142,6 +142,14 @@ if (unit_tgt_state == true) {
 else {
     // Bounce
     if (!place_empty(x+lengthdir_x(speed, direction), y+lengthdir_y(speed, direction))) {
+        unit_inst = collision_point(x+lengthdir_x(speed+18, direction), y+lengthdir_y(speed+18, direction),obj_parent_unit,false,true);
+        show_debug_message(string(unit_inst));
+        if (unit_inst != noone) {
+            with (unit_inst) {
+                self.direction = other.direction;
+                self.speed = (other.unit_weight * other.speed) / self.unit_weight;
+            }
+        }
         if (!place_empty(x, y+lengthdir_y(speed, direction))) {
             vspeed = -vspeed;
         }
